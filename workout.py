@@ -36,7 +36,7 @@ def get_calendar_service():
     
     return build('calendar', 'v3', credentials=creds)
 
-# @st.cache_data
+@st.cache_data
 def get_events(days=180):
     """
     Fetch events from the specified number of days ago through current date.
