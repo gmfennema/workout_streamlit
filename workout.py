@@ -37,7 +37,7 @@ def get_calendar_service():
     return build('calendar', 'v3', credentials=creds)
 
 # @st.cache_data
-def get_events(days=365):
+def get_events(days=180):
     """
     Fetch events from the specified number of days ago through current date.
     Uses Streamlit caching to avoid repeated API calls.
@@ -432,7 +432,7 @@ def main():
     if not exercise_df.empty:
         # Define the target lifts
         target_lifts = ["Deadlift", "Bench Press", "Squat"]
-        # Dictionary to hold the most recent PR weight for each lift.
+        # Dictionary to hold the most recent PR weight and date for each lift.
         pr_dict = {lift: None for lift in target_lifts}
         
         # Sort by the start time descending so the first occurrence is the most recent.
@@ -447,7 +447,8 @@ def main():
                             lift = m.group(1).strip()
                             weight = m.group(2).strip()
                             if lift in target_lifts and pr_dict[lift] is None:
-                                pr_dict[lift] = weight
+                                # Save both the weight and the event's Start date
+                                pr_dict[lift] = {"weight": weight, "date": row['Start']}
             # If we've found a PR for all target lifts, we can break early.
             if all(pr_dict[lift] is not None for lift in target_lifts):
                 break
@@ -455,16 +456,24 @@ def main():
         st.subheader("Personal Records")
         pr_html = "<div style='display: flex; flex-wrap: wrap; justify-content: space-between;'>"
         for lift in target_lifts:
-            # If not found, display "N/A"
-            result = pr_dict[lift] if pr_dict[lift] is not None else "N/A"
+            record = pr_dict[lift]
+            if record is not None:
+                result = record["weight"]
+                # Format the date as "YYYY-MM-DD"
+                date_str = record["date"].strftime("%Y-%m-%d") if record.get("date") else ""
+            else:
+                result = "N/A"
+                date_str = ""
             pr_html += (
                 f"<div style='background-color: white; border-radius: 8px; padding: 10px; margin: 5px; "
                 "flex-basis: calc(33.33% - 10px); text-align: center; "
                 "box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>"
                 f"<p style='margin-bottom: 5px; color: #333; font-weight: bold;'>{lift}</p>"
                 f"<div style='font-size: 24px; font-weight: bold; color: #02A6F4;'>{result}</div>"
-                "</div>"
             )
+            if date_str:
+                pr_html += f"<div style='font-size: 12px; font-weight: 300; color:rgb(171, 172, 173);'>{date_str}</div>"
+            pr_html += "</div>"
         pr_html += "</div>"
         st.markdown(pr_html, unsafe_allow_html=True)
         
