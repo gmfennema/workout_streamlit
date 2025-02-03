@@ -482,7 +482,7 @@ def main():
         # Muscle Group Filter for the activity section with capitalized options
         selected_muscle_group = st.selectbox(
             "Filter by Muscle Group", 
-            ["All", "Chest", "Back", "Legs", "Byceps", "Triceps", "Core"]
+            ["All", "Chest", "Back", "Legs", "Biceps", "Triceps", "Core"]
         )
         if selected_muscle_group != "All":
             filtered_exercise_df = exercise_df[
