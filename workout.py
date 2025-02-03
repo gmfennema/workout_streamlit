@@ -10,6 +10,7 @@ from googleapiclient.discovery import build
 from bs4 import BeautifulSoup
 from zoneinfo import ZoneInfo
 import re
+import markdown
 
 # Constants
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
@@ -383,7 +384,6 @@ def format_workout_description(description: str) -> str:
 def main():
     st.set_page_config(page_title="Workout Tracker", layout="centered")  # Centered layout for fixed width
     
-    # Add custom CSS for mobile optimization
     st.markdown("""
         <style>
         /* Container adjustments */
@@ -518,18 +518,29 @@ def main():
             
             # Display workout details if a valid date is selected
             if selected_date is not None:
-                day_workouts = filtered_exercise_df[filtered_exercise_df['Start'].dt.date == selected_date]
+                day_workouts = filtered_exercise_df[
+                    filtered_exercise_df['Start'].dt.date == selected_date
+                ]
                 descriptions = day_workouts['Description'].dropna().tolist()
                 
                 if descriptions:
+                    # First, convert each detail using your formatting function.
                     formatted_descriptions = [format_workout_description(desc) for desc in descriptions]
+                    
+                    # Combine all formatted markdown into one string
+                    combined_md = "\n\n".join(formatted_descriptions)
+                    # Convert the markdown string to HTML
+                    html_converted = markdown.markdown(combined_md)
+                    # Wrap the HTML in a styled container
+                    styled_html = f"""
+                    <div style="background-color: #f8f8f8; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 10px 20px 10px 40px;">
+                        {html_converted}
+                    </div>
+                    """
                     
                     st.markdown(f"### {selected_date} Workout Details")
                     st.markdown("---")
-                    
-                    for desc in formatted_descriptions:
-                        st.markdown(desc)
-                        st.markdown("")
+                    st.markdown(styled_html, unsafe_allow_html=True)
             
             # Prepare and display the heatmap
             current_year = datetime.now(ZoneInfo("America/Phoenix")).year
