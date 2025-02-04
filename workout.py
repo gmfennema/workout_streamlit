@@ -533,7 +533,7 @@ def main():
                     html_converted = markdown.markdown(combined_md)
                     # Wrap the HTML in a styled container
                     styled_html = f"""
-                    <div style="background-color: #f8f8f8; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 10px 20px 10px 40px;">
+                    <div style="background-color: #f8f8f8; font-size: 14px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 10px 20px 10px 40px;">
                         {html_converted}
                     </div>
                     """
