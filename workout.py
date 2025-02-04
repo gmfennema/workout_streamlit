@@ -37,14 +37,14 @@ def get_calendar_service():
     
     return build('calendar', 'v3', credentials=creds)
 
-# @st.cache_data
+@st.cache_data(ttl=3600)
 def get_events(days=180):
     """
     Fetch events from the specified number of days ago through current date.
     Uses Streamlit caching to avoid repeated API calls.
     
     Args:
-        days (int): Number of days to fetch events for. Defaults to 365.
+        days (int): Number of days to fetch events for. Defaults to 180.
     """
     service = get_calendar_service()
     all_events = []
